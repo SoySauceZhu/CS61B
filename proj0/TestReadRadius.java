@@ -1,5 +1,5 @@
 /**
- *  Tests Nbody.readRadius. Reads in ./data/planets.txt and checks to see that
+ *  Tests NBody.readRadius. Reads in ./data/planets.txt and checks to see that
  *  result matches hard coded value.
  */
 public class TestReadRadius {
