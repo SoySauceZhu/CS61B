@@ -43,7 +43,29 @@ public class Planet {
     public double calcForceExertedByY(Planet that) {
         return calcForceExertedBy(that) * (that.yyPos - this.yyPos) / calcDistance(that);
     }
+    public double calcNetForceExertedByX(Planet[] allPlanets)
+    {
+        double totalForce = 0;
+        for (Planet planet : allPlanets) {
+            if (this.equals(planet)) {
+                continue;
+            }
+            totalForce += calcForceExertedByX(planet);
+        }
+        return totalForce;
+    }
 
+    public double calcNetForceExertedByY(Planet[] allPlanets)
+    {
+        double totalForce = 0;
+        for (Planet planet : allPlanets) {
+            if (this.equals(planet)) {
+                continue;
+            }
+            totalForce += calcForceExertedByY(planet);
+        }
+        return totalForce;
+    }
     public void update(double dt, double fX, double fY) {
         this.xxVel += fX / mass * dt;
         this.yyVel += fY / mass * dt;
@@ -51,4 +73,7 @@ public class Planet {
         this.yyPos += this.yyVel * dt;
     }
 
+    public void draw(){
+        StdDraw.picture(xxPos, yyPos, "images/" + imgFileName);
+    }
 }

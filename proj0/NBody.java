@@ -30,32 +30,14 @@ public class NBody {
         return plList;
     }
 
-    public static double forceComponentX(Planet myPln, Planet[] plList) {
-        double forceX = 0;
-        for (Planet p : plList) {
-            if (!myPln.equals(p)) {
-                forceX += myPln.calcForceExertedByX(p);
-            }
-        }
-        return forceX;
-    }
 
-    public static double forceComponentY(Planet myPln, Planet[] plList) {
-        double forceY = 0;
-        for (Planet p : plList) {
-            if (!myPln.equals(p)) {
-                forceY += myPln.calcForceExertedByY(p);
-            }
-        }
-        return forceY;
-    }
 
     public static void main(String[] args) {
         // Read in the configuration
         double T = Double.parseDouble(args[0]);
         double dt = Double.parseDouble(args[1]);
         String filename = args[2];
-        Planet[] Planets = NBody.readPlanets(filename);
+        Planet[] planets = NBody.readPlanets(filename);
         double uniRadius = NBody.readRadius(filename);
 
         // Scale the canvas : universe
@@ -65,35 +47,38 @@ public class NBody {
 
         // Simulation
         double t = 0;
-
+        int num = planets.length;
         while (t <= T) {
             // update time
-            t += dt;
-
-            // update by iteration
-            // everyone have interaction with all others : You need to override methods in Planet
-            for (Planet p : Planets) {
-                p.update(dt, NBody.forceComponentX(p,Planets), NBody.forceComponentY(p,Planets));
+            double[] xForces = new double[num];
+            double[] yForces = new double[num];
+            for(int i = 0; i < num; i++){
+                xForces[i] = planets[i].calcNetForceExertedByX(planets);
+                yForces[i] = planets[i].calcNetForceExertedByY(planets);
+            }
+            for(int i = 0; i < num; i++){
+                planets[i].update(dt, xForces[i], yForces[i]);
             }
 
-
-            // draw everything at once
+            // draw the background picture
             StdDraw.picture(0, 0, "images/starfield.jpg");
-            for (Planet p : Planets) {
-                StdDraw.picture(p.xxPos, p.yyPos, "images/"+p.imgFileName);
-            }
-            StdDraw.show();
 
-            // sleep
-            StdDraw.pause(5);
+            // draw all the planets
+            for (Planet planet : planets) {
+                planet.draw();
+            }
+
+            StdDraw.show();
+            StdDraw.pause(10);
+            t += dt;
         }
 
-        StdOut.printf("%d\n", Planets.length);
-        StdOut.printf("%.2e\n", Planets);
-        for (int i = 0; i < Planets.length; i++) {
+        StdOut.printf("%d\n", planets.length);
+        StdOut.printf("%.2e\n", uniRadius);
+        for (int i = 0; i < planets.length; i++) {
             StdOut.printf("%11.4e %11.4e %11.4e %11.4e %11.4e %12s\n",
-                    Planets[i].xxPos, Planets[i].yyPos, Planets[i].xxVel,
-                    Planets[i].yyVel, Planets[i].mass, Planets[i].imgFileName);
+                    planets[i].xxPos, planets[i].yyPos, planets[i].xxVel,
+                    planets[i].yyVel, planets[i].mass, planets[i].imgFileName);
         }
     }
 }
