@@ -72,6 +72,13 @@ public class IntList {
         return new IntList(L.first * L.first, squareListRecursive(L.rest));
     }
 
+
+
+
+
+
+
+
     /** DO NOT MODIFY ANYTHING ABOVE THIS LINE! */
 
 
@@ -112,6 +119,45 @@ public class IntList {
         return new IntList(A.first, catenate(A.rest, B));
 
     }
+
+    /**
+     * Returns the reverse of the given IntList.
+     * This method is destructive. If given null
+     * as an input, returns null.
+     */
+    public static IntList reverse(IntList A) {
+        if (A == null) {
+            return null;
+        }
+        IntList list = new IntList(A.first, null);
+        while (A.rest != null) {
+            A = A.rest;
+            list = new IntList(A.first, list);
+        }
+        return list;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
