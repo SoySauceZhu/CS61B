@@ -1,12 +1,11 @@
 import java.util.Formatter;
-import java.util.Stack;
 
 /**
  * A naked recursive list of integers, similar to what we saw in lecture 3, but
  * with a large number of additional methods.
  *
  * @author P. N. Hilfinger, with some modifications by Josh Hug and melaniecebula
- *         [Do not modify this file.]
+ * [Do not modify this file.]
  */
 public class IntList {
     /**
@@ -30,7 +29,7 @@ public class IntList {
      * A List with null rest, and first = 0.
      */
     public IntList() {
-    /* NOTE: public IntList () { }  would also work. */
+        /* NOTE: public IntList () { }  would also work. */
         this(0, null);
     }
 
@@ -83,8 +82,11 @@ public class IntList {
 
     public static IntList dcatenate(IntList A, IntList B) {
         //TODO:  fill in method
+        if (A == null) {
+            return B;
+        }
         IntList A_ = A;
-        return helper1(A, B , A_);
+        return helper1(A, B, A_);
     }
 
     private static IntList helper1(IntList A, IntList B, IntList A_) {
@@ -101,15 +103,18 @@ public class IntList {
      */
     public static IntList catenate(IntList A, IntList B) {
         //TODO:  fill in method
-        IntList C = helper3(A);
+        if (A == null) {
+            return B;
+        }
+        IntList C = helper2(A);
         return dcatenate(C, B);
     }
 
-    private static IntList helper3(IntList OLD) {
+    private static IntList helper2(IntList OLD) {
         IntList NEW = new IntList();
         IntList NEW_ = NEW;
         IntList OLD_ = OLD;
-        while(true) {
+        while (true) {
             NEW_.first = OLD_.first;
             OLD_ = OLD_.rest;
             if (OLD_ == null) {
@@ -120,20 +125,6 @@ public class IntList {
         }
         return NEW;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**
