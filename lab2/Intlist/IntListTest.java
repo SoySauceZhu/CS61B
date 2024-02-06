@@ -1,6 +1,6 @@
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class IntListTest {
 
@@ -59,11 +59,11 @@ public class IntListTest {
 
     @Test
     public void testCatenate() {
-        IntList A = IntList.of(1, 2, 3);
+        IntList A = IntList.of(1, 2, 3, 7, 8, 9);
         IntList B = IntList.of(4, 5, 6);
-        IntList exp = IntList.of(1, 2, 3, 4, 5, 6);
+        IntList exp = IntList.of(1, 2, 3, 7, 8, 9, 4, 5, 6);
         assertEquals(exp, IntList.catenate(A, B));
-        assertEquals(IntList.of(1, 2, 3), A);
+        assertEquals(IntList.of(1, 2, 3, 7, 8, 9), A);
     }
 
 }
