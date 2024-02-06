@@ -106,25 +106,13 @@ public class IntList {
         if (A == null) {
             return B;
         }
-        IntList C = helper2(A);
-        return dcatenate(C, B);
+        if (A.rest == null) {
+            return new IntList(A.first, B);
+        }
+        return new IntList(A.first, catenate(A.rest, B));
+
     }
 
-    private static IntList helper2(IntList OLD) {
-        IntList NEW = new IntList();
-        IntList NEW_ = NEW;
-        IntList OLD_ = OLD;
-        while (true) {
-            NEW_.first = OLD_.first;
-            OLD_ = OLD_.rest;
-            if (OLD_ == null) {
-                break;
-            }
-            NEW_.rest = new IntList();
-            NEW_ = NEW_.rest;
-        }
-        return NEW;
-    }
 
 
     /**
