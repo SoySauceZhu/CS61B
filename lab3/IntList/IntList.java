@@ -129,12 +129,15 @@ public class IntList {
         if (A == null) {
             return null;
         }
-        IntList list = new IntList(A.first, null);
-        while (A.rest != null) {
-            A = A.rest;
-            list = new IntList(A.first, list);
+        if (A.rest == null) {
+            return A;
         }
-        return list;
+
+        IntList reverseRest = reverse(A.rest);
+        A.rest.rest = A;
+        A.rest = null;
+
+        return reverseRest;
     }
 
 
