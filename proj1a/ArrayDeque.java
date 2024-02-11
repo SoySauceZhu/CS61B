@@ -11,10 +11,10 @@ public class ArrayDeque<T> {
         size = 0;
     }
 
-    public void resize(int opacity) {
+    private void resize(int opacity) {
         T[] T = (T[]) new Object[opacity];
-        if (front == 0) {
-            System.arraycopy(array, 0, T, 0, size);
+        if (front < rear) {
+            System.arraycopy(array, front, T, 0, size);
         } else {
             System.arraycopy(array, front, T, 0, array.length - front);
             System.arraycopy(array, 0, T, array.length - front, rear);
@@ -103,17 +103,21 @@ public class ArrayDeque<T> {
         }
     }
 
-    public static void main(String[] args) {
-        ArrayDeque<Integer> list = new ArrayDeque<>();
-        for (int i = 0; i < 100; i++) {
-            list.addLast(i);
-            if (i % 10 == 0) {
-                System.out.println(list.get(i));
-            }
-        }
-
-        for (int i = 0; i < 99; i++) {
-            System.out.println(list.removeLast());
-        }
+    public void printDeque() {
+        // TODO
     }
+
+//    public static void main(String[] args) {
+//        ArrayDeque<Integer> list = new ArrayDeque<>();
+//        for (int i = 0; i < 100; i++) {
+//            list.addLast(i);
+//            if (i % 10 == 0) {
+//                System.out.println(list.get(i));
+//            }
+//        }
+//
+//        for (int i = 0; i < 99; i++) {
+//            System.out.println(list.removeLast());
+//        }
+//    }
 }
