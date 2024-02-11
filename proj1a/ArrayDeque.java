@@ -5,7 +5,7 @@ public class ArrayDeque<T> {
     private int rear;
 
     public ArrayDeque() {
-        array = (T[]) new Object[8];
+        array = (T[]) new Object[4];
         front = 0;
         rear = 0;
         size = 0;
@@ -93,7 +93,7 @@ public class ArrayDeque<T> {
     }
 
     public T get(int index) {
-        if (index > size) {
+        if (index > size || index < 0) {
             return null;
         }
         if (index < array.length - front) {
@@ -106,18 +106,14 @@ public class ArrayDeque<T> {
     public void printDeque() {
         // TODO
     }
-
+//
 //    public static void main(String[] args) {
 //        ArrayDeque<Integer> list = new ArrayDeque<>();
-//        for (int i = 0; i < 100; i++) {
-//            list.addLast(i);
-//            if (i % 10 == 0) {
-//                System.out.println(list.get(i));
-//            }
-//        }
-//
-//        for (int i = 0; i < 99; i++) {
-//            System.out.println(list.removeLast());
-//        }
+//        list.addFirst(0);
+//        list.addFirst(1);
+//        list.addFirst(2);
+//        list.isEmpty();
+//        list.addFirst(4);
+//        list.removeLast();
 //    }
 }

@@ -106,17 +106,4 @@ public class LinkedListDeque<T> {
         return helper(index - 1, ptr.next);
     }
 
-    public static void main(String[] args) {
-        LinkedListDeque<String> list = new LinkedListDeque<>();
-        list.addFirst("A");
-        list.addFirst("B");
-        list.addLast("1");
-        list.addLast("2");
-        list.addFirst("C");
-        for (int i = 0; i < 5; i++) {
-            System.out.println(list.getRecursive(i));
-
-        }
-        list.printDeque();
-    }
 }
