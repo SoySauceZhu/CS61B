@@ -5,7 +5,7 @@ public class ArrayDeque<T> {
     private int rear;
 
     public ArrayDeque() {
-        array = (T[]) new Object[4];
+        array = (T[]) new Object[8];
         front = 0;
         rear = 0;
         size = 0;
@@ -106,14 +106,10 @@ public class ArrayDeque<T> {
     public void printDeque() {
         // TODO
     }
-//
-//    public static void main(String[] args) {
-//        ArrayDeque<Integer> list = new ArrayDeque<>();
-//        list.addFirst(0);
-//        list.addFirst(1);
-//        list.addFirst(2);
-//        list.isEmpty();
-//        list.addFirst(4);
-//        list.removeLast();
-//    }
+
+    public static void main(String[] args) {
+        ArrayDeque<Integer> list = new ArrayDeque<>();
+        list.addFirst(0);
+        System.out.println(list.get(2));
+    }
 }
