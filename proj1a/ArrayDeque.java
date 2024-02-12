@@ -78,12 +78,12 @@ public class ArrayDeque<T> {
         if (size == 0) {
             return null;
         }
-        rear--;
-        T item = array[rear];
-        array[rear] = null;
         if (rear == 0) {
             rear = array.length;
         }
+        rear--;
+        T item = array[rear];
+        array[rear] = null;
         size--;
 
         if (size < 0.3 * array.length && array.length > 16) {
@@ -107,9 +107,18 @@ public class ArrayDeque<T> {
         // TODO
     }
 
-    public static void main(String[] args) {
-        ArrayDeque<Integer> list = new ArrayDeque<>();
-        list.addFirst(0);
-        System.out.println(list.get(2));
-    }
+//    public static void main(String[] args) {
+//        ArrayDeque<Integer> list = new ArrayDeque<>();
+//        list.addFirst(0);
+//        list.addFirst(0);
+//        list.addFirst(0);
+//        list.addFirst(0);
+//        list.addFirst(0);
+//        list.addFirst(0);
+//        list.addFirst(0);
+//        list.addFirst(0);
+//        list.addFirst(0);
+//        list.addFirst(0);
+//        System.out.println(list.get(2));
+//    }
 }
