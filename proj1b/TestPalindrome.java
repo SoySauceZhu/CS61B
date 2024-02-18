@@ -11,7 +11,7 @@ public class TestPalindrome {
     public void testWordToDeque() {
         Deque d = palindrome.wordToDeque("persiflage");
         String actual = "";
-        for (int i = 0; i < "persiflage".length(); i++) {
+        for (int i = 0; i < 10; i++) {
             actual += d.removeFirst();
         }
         assertEquals("persiflage", actual);
@@ -20,11 +20,19 @@ public class TestPalindrome {
 
     @Test
     public void testIsPalindrome() {
-        assertFalse(palindrome.isPalindrome("persjifods"));
-        assertTrue(palindrome.isPalindrome("abcba"));
-        assertTrue(palindrome.isPalindrome("abccba"));
-        assertFalse(palindrome.isPalindrome("cat"));
+        assertTrue(palindrome.isPalindrome(""));
+        assertTrue(palindrome.isPalindrome("a"));
+        assertTrue(palindrome.isPalindrome("aba"));
+        assertTrue(palindrome.isPalindrome("aaccbbbccaa"));
+
+        assertFalse(palindrome.isPalindrome("ab"));
+        assertFalse(palindrome.isPalindrome("ababba"));
+    }
+
+    @Test
+    public void testIsOffByOnePalindrome() {
         CharacterComparator cc = new OffByOne();
         assertTrue(palindrome.isPalindrome("flake", cc));
+        assertFalse(palindrome.isPalindrome("aba", cc));
     }
 }
