@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/*TODO: Replace every TETile[][] argument with instance variable*/
+
 public class Map {
     private final TETile[][] floorTiles;
     private final int WIDTH;
@@ -20,13 +22,29 @@ public class Map {
         floorTiles = new TETile[WIDTH][HEIGHT];
     }
 
-    private static class Tuple {
+    private static class Position {
         protected int X;
         protected int Y;
 
-        public Tuple(int x, int y) {
+        public Position(int x, int y) {
             X = x;
             Y = y;
+        }
+
+        protected void goUp() {
+            Y++;
+        }
+
+        protected void goRight() {
+            X++;
+        }
+
+        protected void goLeft() {
+            X--;
+        }
+
+        protected void goDown() {
+            Y--;
         }
     }
 
@@ -55,22 +73,86 @@ public class Map {
 
         fillWithNothing(floorTiles);
 
-        linkRooms(roomsList, floorTiles);
+//        linkRooms(roomsList, floorTiles);
 
         return floorTiles;
     }
 
     private void linkRooms(Room[] rooms, TETile[][] tiles) {
         Room home = rooms[RandomUtils.uniform(random, rooms.length)];
+
+        int[][] digitMap = tilesToDigitMap(tiles);
+
         for (Room room : rooms) {
-            if (!isConnect(room, home, tiles)) {
-                linkTwoRoom(room, home, tiles);
+            // if room (tile0 of a room) is NOT connected to home (tile0 of home), link the room to one of adjacent floor tile
+        }
+
+    }
+/*
+    private boolean isConnected(Position A, Position B, int[][] digitMap) {
+        Position ptr = B;
+
+        while (detectTrue(B, digitMap) == -1) {
+            digitMap[ptr.X][ptr.Y] = 1;     // 1 means accessible
+            switch () {
+                case 0:
+                    ptr.goUp();
+                case 1:
+                    ptr.goRight();
+                case 2:
+                    ptr.goDown();
+                case 3:
+                    ptr.goLeft();
+                default:
+                    switch () {
+                        case 0:
+                    }
+
             }
         }
     }
+ */
 
-    private boolean isConnect(Room room, Room home, TETile[][] tiles) {
-        return false;
+    private int detectFloor(Position pos, int[][] digitMap) {
+        if (pos.Y < digitMap[0].length - 1) {
+            if (digitMap[pos.X][pos.Y + 1] == 0) return 0;
+        } else if (pos.X < digitMap.length - 1) {
+            if (digitMap[pos.X + 1][pos.Y] == 0) return 1;
+        } else if (pos.Y > 0) {
+            if (digitMap[pos.X][pos.Y - 1] == 0) return 2;
+        } else if (pos.X > 0) {
+            if (digitMap[pos.X - 1][pos.Y] == 0) return 3;
+        }
+        return -1;
+    }
+
+    private int detectTrue(Position pos, int[][] digitMap) {
+        if (pos.X > 0) {
+            if (digitMap[pos.X - 1][pos.Y] == 1) return 3;
+        } else if (pos.Y > 0) {
+            if (digitMap[pos.X][pos.Y - 1] == 1) return 2;
+        } else if (pos.X < digitMap.length - 1) {
+            if (digitMap[pos.X + 1][pos.Y] == 1) return 1;
+        } else if (pos.Y < digitMap[0].length - 1) {
+            if (digitMap[pos.X][pos.Y + 1] == 1) return 0;
+        }
+        return -1;
+    }
+
+    private int[][] tilesToDigitMap(TETile[][] tiles) {
+
+        int[][] digitMap = new int[WIDTH][HEIGHT];
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                if (tiles[x][y].description().equals("nothing")) {
+                    digitMap[x][y] = -1;        // -1 means nothing
+                } else {
+                    digitMap[x][y] = 0;         // 0 means unchecked floor
+                }
+            }
+        }
+        return digitMap;
+
     }
 
     // Update the given TETile[][]
@@ -106,8 +188,8 @@ public class Map {
         blockBanner(roomMap, 0, 0, 1, HEIGHT);
 
         for (int i = 0; i < roomNum; i++) {
-            List<Tuple> truePosition = booleanMapToList(roomMap);
-            Tuple position = truePosition.get(RandomUtils.uniform(random, 0, truePosition.size()));
+            List<Position> truePosition = booleanMapToList(roomMap);
+            Position position = truePosition.get(RandomUtils.uniform(random, 0, truePosition.size()));
             int randX = position.X;
             int randY = position.Y;
             int randWidth = RandomUtils.uniform(random, 2, 10);
@@ -120,12 +202,12 @@ public class Map {
     }
 
 
-    private List<Tuple> booleanMapToList(boolean[][] map) {
-        List<Tuple> list = new ArrayList<>();
+    private List<Position> booleanMapToList(boolean[][] map) {
+        List<Position> list = new ArrayList<>();
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 if (map[x][y]) {
-                    list.add(new Tuple(x, y));
+                    list.add(new Position(x, y));
                 }
             }
         }
@@ -147,7 +229,7 @@ public class Map {
         for (Room room : rooms) {
             for (int x = room.X; x < room.width + room.X; x++) {
                 for (int y = room.Y; y < room.height + room.Y; y++) {
-                    tiles[x][y] = Tileset.FLOOR;
+                    tiles[x][y] = Tileset.UNLOCKED_DOOR;
                 }
             }
         }
