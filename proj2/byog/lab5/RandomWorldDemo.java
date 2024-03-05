@@ -23,8 +23,9 @@ public class RandomWorldDemo {
      * @param tiles
      */
     public static void fillWithRandomTiles(TETile[][] tiles) {
-        int height = tiles[0].length;
-        int width = tiles.length;
+        int height = tiles[0].length;   // Num of rows
+        int width = tiles.length;       // Num of columns
+        // Generate columns by columns
         for (int x = 0; x < width; x += 1) {
             for (int y = 0; y < height; y += 1) {
                 tiles[x][y] = randomTile();
@@ -51,7 +52,7 @@ public class RandomWorldDemo {
             case 4:
                 return Tileset.GRASS;
             default:
-                return null;
+                return Tileset.NOTHING;
         }
     }
 
@@ -59,7 +60,10 @@ public class RandomWorldDemo {
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
 
+        // Initialize empty set of tiles
         TETile[][] randomTiles = new TETile[WIDTH][HEIGHT];
+
+        // Configure the tiles
         fillWithRandomTiles(randomTiles);
 
         ter.renderFrame(randomTiles);

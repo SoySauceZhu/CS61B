@@ -32,6 +32,8 @@ public class Game {
         // and return a 2D tile representation of the world that would have been
         // drawn if the same inputs had been given to playWithKeyboard().
 
+        // TODO: Player operation
+
         TETile[][] finalWorldFrame = null;
         return finalWorldFrame;
     }
