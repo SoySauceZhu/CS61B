@@ -14,6 +14,8 @@ public class Map {
     private final int WIDTH;
     private final int HEIGHT;
 
+    private final TETile _default = Tileset.FLOOR;
+
     Random random = new Random();
 
     public Map(int WIDTH, int HEIGHT) {
@@ -31,21 +33,6 @@ public class Map {
             Y = y;
         }
 
-        protected void goUp() {
-            Y++;
-        }
-
-        protected void goRight() {
-            X++;
-        }
-
-        protected void goLeft() {
-            X--;
-        }
-
-        protected void goDown() {
-            Y--;
-        }
     }
 
     private static class Room {
@@ -65,82 +52,142 @@ public class Map {
     public TETile[][] initialize() {
         // TODO: Create a random world map
 
-        int roomNum = RandomUtils.uniform(random, 22, 27);
+        int roomNum = RandomUtils.uniform(random, 25, 30);
 
         Room[] roomsList = createRoomScheme(roomNum);
 
-        drawRooms(roomsList, floorTiles);
-
         fillWithNothing(floorTiles);
 
-//        linkRooms(roomsList, floorTiles);
+        drawRooms(roomsList, floorTiles);
+
+        linkRegions(floorTiles);
+
+        drawWalls(floorTiles);
 
         return floorTiles;
     }
 
-    private void linkRooms(Room[] rooms, TETile[][] tiles) {
-        Room home = rooms[RandomUtils.uniform(random, rooms.length)];
-
-        int[][] digitMap = tilesToDigitMap(tiles);
-
-        for (Room room : rooms) {
-            // if room (tile0 of a room) is NOT connected to home (tile0 of home), link the room to one of adjacent floor tile
-        }
-
-    }
-/*
-    private boolean isConnected(Position A, Position B, int[][] digitMap) {
-        Position ptr = B;
-
-        while (detectTrue(B, digitMap) == -1) {
-            digitMap[ptr.X][ptr.Y] = 1;     // 1 means accessible
-            switch () {
-                case 0:
-                    ptr.goUp();
-                case 1:
-                    ptr.goRight();
-                case 2:
-                    ptr.goDown();
-                case 3:
-                    ptr.goLeft();
-                default:
-                    switch () {
-                        case 0:
-                    }
-
+    private void drawWalls(TETile[][] tiles) {
+        for (int i = 0; i < tiles.length; i++) {
+            for (int j = 0; j < tiles[0].length; j++) {
+                if (tiles[i][j] == _default) {
+                    drawWallAround(new Position(i, j), tiles);
+                }
             }
         }
     }
- */
 
-    private int detectFloor(Position pos, int[][] digitMap) {
-        if (pos.Y < digitMap[0].length - 1) {
-            if (digitMap[pos.X][pos.Y + 1] == 0) return 0;
-        } else if (pos.X < digitMap.length - 1) {
-            if (digitMap[pos.X + 1][pos.Y] == 0) return 1;
-        } else if (pos.Y > 0) {
-            if (digitMap[pos.X][pos.Y - 1] == 0) return 2;
-        } else if (pos.X > 0) {
-            if (digitMap[pos.X - 1][pos.Y] == 0) return 3;
+    private void drawWallAround(Position p, TETile[][] tiles) {
+        int x = p.X;
+        int y = p.Y;
+
+        if (x - 1 >= 0 && tiles[x - 1][y].description().equals("nothing")) {
+            tiles[x - 1][y] = Tileset.WALL;
         }
-        return -1;
+
+        if (x + 1 < tiles.length && tiles[x + 1][y].description().equals("nothing")) {
+            tiles[x + 1][y] = Tileset.WALL;
+        }
+
+        if (y - 1 >= 0 && tiles[x][y - 1].description().equals("nothing")) {
+            tiles[x][y - 1] = Tileset.WALL;
+        }
+
+        if (y + 1 < tiles[0].length && tiles[x][y + 1].description().equals("nothing")) {
+            tiles[x][y + 1] = Tileset.WALL;
+        }
+
+        if (x - 1 >= 0 && y - 1 >= 0 && tiles[x - 1][y - 1].description().equals("nothing")) {
+            tiles[x - 1][y - 1] = Tileset.WALL;
+        }
+
+        if (x + 1 < tiles.length && y - 1 >= 0 && tiles[x + 1][y - 1].description().equals("nothing")) {
+            tiles[x + 1][y - 1] = Tileset.WALL;
+        }
+
+        if (x - 1 >= 0 && y + 1 < tiles[0].length && tiles[x - 1][y + 1].description().equals("nothing")) {
+            tiles[x - 1][y + 1] = Tileset.WALL;
+        }
+
+        if (x + 1 < tiles.length && y + 1 < tiles[0].length && tiles[x + 1][y + 1].description().equals("nothing")) {
+            tiles[x + 1][y + 1] = Tileset.WALL;
+        }
     }
 
-    private int detectTrue(Position pos, int[][] digitMap) {
-        if (pos.X > 0) {
-            if (digitMap[pos.X - 1][pos.Y] == 1) return 3;
-        } else if (pos.Y > 0) {
-            if (digitMap[pos.X][pos.Y - 1] == 1) return 2;
-        } else if (pos.X < digitMap.length - 1) {
-            if (digitMap[pos.X + 1][pos.Y] == 1) return 1;
-        } else if (pos.Y < digitMap[0].length - 1) {
-            if (digitMap[pos.X][pos.Y + 1] == 1) return 0;
+    private void linkRegions(TETile[][] tiles) {
+        // UnionMap will only contain small number of region ID. e.g. -1 1 2 3 ... but no 0
+        Tuple digitUnionMap = unionMap(tilesToDigitMap(tiles));
+        int[][] unionMap = digitUnionMap.unionMap;
+        int regionNum = digitUnionMap.regionNum;
+
+        List<Position>[] regions = new List[regionNum];
+
+        for (int i = 0; i < regionNum; i++) {
+            regions[i] = new ArrayList<>();
         }
-        return -1;
+
+        for (int i = 0; i < unionMap.length; i++) {
+            for (int j = 0; j < unionMap[0].length; j++) {
+                if (unionMap[i][j] != -1) {
+                    regions[unionMap[i][j] - 1].add(new Position(i, j));
+                }
+            }
+        }
+
+        for (int i = 0; i < regionNum - 1; i++) {
+            Position p1 = regions[i].get(RandomUtils.uniform(random, regions[i].size()));
+            Position p2 = regions[i + 1].get(RandomUtils.uniform(random, regions[i + 1].size()));
+            linkTwoPosition(p1, p2, tiles);
+        }
     }
 
+    private Tuple unionMap(int[][] digitMap) {
+        int[][] unionMap = digitMap;
+
+        int numOfRegions = 0;
+
+        for (int i = 0; i < digitMap.length; i++) {
+            for (int j = 0; j < digitMap[0].length; j++) {
+                if (digitMap[i][j] == 0) {
+                    numOfRegions++;
+                    floodFill(unionMap, i, j, 0, numOfRegions);
+                }
+            }
+        }
+
+        return new Tuple(unionMap, numOfRegions);
+    }
+
+    private class Tuple {
+        int[][] unionMap;
+        int regionNum;
+
+        public Tuple(int[][] unionMap, int regionNum) {
+            this.unionMap = unionMap;
+            this.regionNum = regionNum;
+        }
+    }
+
+    private void floodFill(int[][] map, int source_x, int source_y,
+                           int source, int target) {
+        // If the ptr is out of bound, no replacement
+        if (source_x < 0 || source_x >= WIDTH - 1 || source_y < 0 || source_y >= HEIGHT - 1) return;
+        // If the value on ptr is not empty (0), no replacement
+        if (map[source_x][source_y] != source) return;
+
+        map[source_x][source_y] = target;
+
+        floodFill(map, source_x + 1, source_y, source, target);
+        floodFill(map, source_x, source_y + 1, source, target);
+        floodFill(map, source_x - 1, source_y, source, target);
+        floodFill(map, source_x, source_y - 1, source, target);
+    }
+
+
+    /**
+     * @return Return int[][] matrix where -1 means nothing, 0 means floor
+     */
     private int[][] tilesToDigitMap(TETile[][] tiles) {
-
         int[][] digitMap = new int[WIDTH][HEIGHT];
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
@@ -152,11 +199,32 @@ public class Map {
             }
         }
         return digitMap;
-
     }
 
-    // Update the given TETile[][]
-    private void linkTwoRoom(Room A, Room B, TETile[][] tiles) {
+    /**
+     * Update the map-tiles by linking two position
+     */
+    private void linkTwoPosition(Position A, Position B, TETile[][] tiles) {
+        if (B.Y >= A.Y) {
+            for (int i = A.Y; i <= B.Y; i++) {
+                tiles[A.X][i] = _default;
+            }
+        } else {
+            for (int i = B.Y; i <= A.Y; i++) {
+                tiles[A.X][i] = _default;
+            }
+        }
+
+        if (B.X >= A.X) {
+            for (int i = A.X; i <= B.X; i++) {
+                tiles[i][B.Y] = _default;
+            }
+        } else {
+            for (int i = B.X; i <= A.X; i++) {
+                tiles[i][B.Y] = _default;
+            }
+        }
+
 
     }
 
@@ -171,7 +239,9 @@ public class Map {
         }
     }
 
-    // Return a list of room instances
+    /**
+     * @return Return a list of room instances
+     */
     private Room[] createRoomScheme(int roomNum) {
         Room[] rooms = new Room[roomNum];
 
@@ -202,11 +272,14 @@ public class Map {
     }
 
 
+    /**
+     * @return A list of Position instances that is true on the boolean map
+     */
     private List<Position> booleanMapToList(boolean[][] map) {
         List<Position> list = new ArrayList<>();
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
-                if (map[x][y]) {
+                if (map[x][y]) {                // If (x,y) is true in boolean map
                     list.add(new Position(x, y));
                 }
             }
@@ -215,6 +288,9 @@ public class Map {
         return list;
     }
 
+    /**
+     * Update the boolean map by banning the given region
+     */
     private void blockBanner(boolean[][] map, int X, int Y, int width, int height) {
 
 
@@ -225,11 +301,14 @@ public class Map {
         }
     }
 
+    /**
+     * Update the tiles by adding rooms in Room[]
+     */
     private void drawRooms(Room[] rooms, TETile[][] tiles) {
         for (Room room : rooms) {
             for (int x = room.X; x < room.width + room.X; x++) {
                 for (int y = room.Y; y < room.height + room.Y; y++) {
-                    tiles[x][y] = Tileset.UNLOCKED_DOOR;
+                    tiles[x][y] = _default;
                 }
             }
         }
