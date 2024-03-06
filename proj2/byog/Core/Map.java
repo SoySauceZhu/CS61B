@@ -64,7 +64,20 @@ public class Map {
 
         drawWalls(floorTiles);
 
+        drawDecoration(floorTiles);
+
         return floorTiles;
+    }
+
+    private void drawDecoration(TETile[][] floorTiles) {
+        for (int i = 0; i < floorTiles.length; i++) {
+            for (int j = 0; j < floorTiles[0].length; j++) {
+                if (floorTiles[i][j].description().equals("floor") && RandomUtils.gaussian(random) > 0.8) {
+                    floorTiles[i][j] = Tileset.GRASS;
+                }
+            }
+
+        }
     }
 
     private void drawWalls(TETile[][] tiles) {
