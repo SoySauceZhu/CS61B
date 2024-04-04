@@ -14,14 +14,18 @@ public class Map {
     private final int WIDTH;
     private final int HEIGHT;
 
+    private Position playerPos;
+
     private final TETile _default = Tileset.FLOOR;
 
-    Random random = new Random();
+    Random random;
 
     public Map(int WIDTH, int HEIGHT) {
         this.WIDTH = WIDTH;
         this.HEIGHT = HEIGHT;
         floorTiles = new TETile[WIDTH][HEIGHT];
+        fillWithNothing(floorTiles);
+        random = new Random();
     }
 
     private static class Position {
@@ -50,23 +54,56 @@ public class Map {
     }
 
     public TETile[][] initialize() {
-        // TODO: Create a random world map
 
         int roomNum = RandomUtils.uniform(random, 25, 30);
 
+        // List of rooms, recording Height, Width, X and Y parameters of a room
         Room[] roomsList = createRoomScheme(roomNum);
 
-        fillWithNothing(floorTiles);
-
+        // Update the floorTiles by filling positions that room list indicates with _default (Tileset.FLOOR)
         drawRooms(roomsList, floorTiles);
 
+        // Update the floorTiles by linking adjacent rooms
         linkRegions(floorTiles);
 
         drawWalls(floorTiles);
 
         drawDecoration(floorTiles);
 
+        drawDoor(floorTiles);
+
+//        drawPlayer(floorTiles);
+
         return floorTiles;
+    }
+
+    private TETile[][] drawPlayer(TETile[][] floorTiles) {
+        TETile[][] output = new TETile[WIDTH][HEIGHT];
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                output[x][y] = floorTiles[x][y];
+            }
+        }
+
+        int x = playerPos.X;
+        int y = playerPos.Y;
+        output[x][y] = Tileset.PLAYER;
+        return output;
+    }
+
+    private void drawDoor(TETile[][] floorTiles) {
+        for (int x = WIDTH / 3; x < WIDTH * 2 / 3; x++) {
+            for (int y = 0; y < HEIGHT / 2; y++) {
+                boolean isWall = floorTiles[x][y].description().equals("wall");
+                boolean upperValid = floorTiles[x][y + 1].description().equals("floor") || floorTiles[x][y + 1].description().equals("grass");
+                boolean lowerValid = y == 0 || floorTiles[x][y - 1].description().equals("nothing");
+                if (isWall && upperValid && lowerValid) {
+                    floorTiles[x][y] = Tileset.LOCKED_DOOR;
+                    playerPos = new Position(x, y + 1);
+                    return;
+                }
+            }
+        }
     }
 
     private void drawDecoration(TETile[][] floorTiles) {
@@ -127,9 +164,13 @@ public class Map {
         }
     }
 
+    /**
+     * Update the input tiles by linking adjacent non-null tiles group
+     */
     private void linkRegions(TETile[][] tiles) {
         // UnionMap will only contain small number of region ID. e.g. -1 1 2 3 ... but no 0
         Tuple digitUnionMap = unionMap(tilesToDigitMap(tiles));
+
         int[][] unionMap = digitUnionMap.unionMap;
         int regionNum = digitUnionMap.regionNum;
 
@@ -154,6 +195,9 @@ public class Map {
         }
     }
 
+    /**
+     * Union intersecting rooms and update digitMap, return a Tuple.
+     */
     private Tuple unionMap(int[][] digitMap) {
         int[][] unionMap = digitMap;
 
@@ -181,8 +225,10 @@ public class Map {
         }
     }
 
-    private void floodFill(int[][] map, int source_x, int source_y,
-                           int source, int target) {
+    /**
+     * Update digit map. Find and replace all adjacent source-like tile by recursion
+     */
+    private void floodFill(int[][] map, int source_x, int source_y, int source, int target) {
         // If the ptr is out of bound, no replacement
         if (source_x < 0 || source_x >= WIDTH - 1 || source_y < 0 || source_y >= HEIGHT - 1) return;
         // If the value on ptr is not empty (0), no replacement
@@ -252,10 +298,7 @@ public class Map {
         }
     }
 
-    /**
-     * @return Return a list of room instances
-     */
-    private Room[] createRoomScheme(int roomNum) {
+    /*private Room[] createRoomScheme(int roomNum) {
         Room[] rooms = new Room[roomNum];
 
         boolean[][] roomMap = new boolean[WIDTH][HEIGHT];
@@ -282,13 +325,31 @@ public class Map {
             rooms[i] = new Room(randWidth, randHeight, randX, randY);
         }
         return rooms;
+    }*/
+
+    /**
+     * @return Return a list of room instances
+     */
+    private Room[] createRoomScheme(int roomNum) {
+        Room[] rooms = new Room[roomNum];
+
+        for (int i = 0; i < roomNum; i++) {
+            int randX = RandomUtils.uniform(random, 1, WIDTH - 11);
+            int randY = RandomUtils.uniform(random, 1, HEIGHT - 11);
+            int randWidth = RandomUtils.uniform(random, 2, 10);
+            int randHeight = RandomUtils.uniform(random, 2, 10);
+
+            rooms[i] = new Room(randWidth, randHeight, randX, randY);
+        }
+
+        return rooms;
     }
 
 
     /**
      * @return A list of Position instances that is true on the boolean map
      */
-    private List<Position> booleanMapToList(boolean[][] map) {
+/*    private List<Position> booleanMapToList(boolean[][] map) {
         List<Position> list = new ArrayList<>();
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
@@ -299,20 +360,18 @@ public class Map {
         }
 
         return list;
-    }
+    }*/
 
     /**
      * Update the boolean map by banning the given region
      */
-    private void blockBanner(boolean[][] map, int X, int Y, int width, int height) {
-
-
+    /*private void blockBanner(boolean[][] map, int X, int Y, int width, int height) {
         for (int i = X; i < X + width; i++) {
             for (int j = Y; j < Y + height; j++) {
                 map[i][j] = false;
             }
         }
-    }
+    }*/
 
     /**
      * Update the tiles by adding rooms in Room[]
@@ -327,9 +386,42 @@ public class Map {
         }
     }
 
+    public void setRandom(int seed) {
+        this.random = new Random(seed);
+    }
 
-    public void control() {
-        // TODO: Get the control signal, updating the floorTile set
+    public TETile[][] getFloorTiles() {
+        return drawPlayer(floorTiles);
+    }
+
+
+    public void control(char step) {
+        int x = playerPos.X;
+        int y = playerPos.Y;
+        if (step == 'w' || step == 'W') {
+            if (!floorTiles[x][y + 1].description().equals("wall")) {
+                playerPos.Y++;
+            }
+        }
+
+        if (step == 'a' || step == 'A') {
+            if (!floorTiles[x - 1][y].description().equals("wall")) {
+                playerPos.X--;
+            }
+        }
+
+        if (step == 's' || step == 'S') {
+            if (!floorTiles[x][y - 1].description().equals("wall")) {
+                playerPos.Y--;
+            }
+        }
+
+        if (step == 'd' || step == 'D') {
+            if (!floorTiles[x + 1][y].description().equals("wall")) {
+                playerPos.X++;
+            }
+        }
+
 
     }
 

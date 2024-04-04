@@ -24,6 +24,7 @@ public class Game {
      * world. However, the behavior is slightly different. After playing with "n123sss:q", the game
      * should save, and thus if we then called playWithInputString with the string "l", we'd expect
      * to get the exact same world back again, since this corresponds to loading the saved game.
+     *
      * @param input the input string to feed to your program
      * @return the 2D TETile[][] representing the state of the world
      */
@@ -34,7 +35,52 @@ public class Game {
 
         // TODO: Player operation
 
-        TETile[][] finalWorldFrame = null;
-        return finalWorldFrame;
+        int seed = parseSeed(input);
+        char start = parseStart(input);
+        char[] control = parseControl(input);
+
+        // N for new game
+        if (start == 'N' || start == 'n') {
+            Map map = new Map(80, 35);
+            map.setRandom(seed);
+            map.initialize();
+
+            for (int i = 0; i < control.length; i++) {
+                char step = control[i];
+                if (step == 'a' || step == 'w' || step == 's' || step == 'd') {
+                    map.control(step);
+                }
+
+                if (step == ':' && control[++i] == 'q') {
+                    // TODO: save
+                    break;
+                }
+            }
+
+            // reminder: getFloorTiles() will compress the world map and the player, while keep the world unchanged
+            return map.getFloorTiles();
+        }
+
+        return null;
     }
+
+    private int parseSeed(String input) {
+        return Integer.parseInt(input.replaceAll("[^0-9]", ""));
+    }
+
+    private char parseStart(String input) {
+        return input.charAt(0);
+    }
+
+    private char[] parseControl(String input) {
+        input = input.toLowerCase();
+        int index = 1;
+        for (; index < input.length(); index++) {
+            if (!Character.isDigit(input.charAt(index))) {
+                break;
+            }
+        }
+        return input.substring(index).toCharArray();
+    }
+
 }
