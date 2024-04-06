@@ -3,13 +3,14 @@ package byog.Core;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 /*TODO: Replace every TETile[][] argument with instance variable*/
 
-public class Map {
+public class Map implements Serializable {
     private final TETile[][] floorTiles;
     private final int WIDTH;
     private final int HEIGHT;
@@ -28,7 +29,7 @@ public class Map {
         random = new Random();
     }
 
-    private static class Position {
+    private static class Position implements Serializable{
         protected int X;
         protected int Y;
 
@@ -394,7 +395,6 @@ public class Map {
         return drawPlayer(floorTiles);
     }
 
-
     public void control(char step) {
         int x = playerPos.X;
         int y = playerPos.Y;
@@ -421,8 +421,6 @@ public class Map {
                 playerPos.X++;
             }
         }
-
-
     }
 
 }

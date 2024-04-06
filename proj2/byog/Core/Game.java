@@ -3,6 +3,8 @@ package byog.Core;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 
+import java.io.*;
+
 public class Game {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
@@ -29,58 +31,106 @@ public class Game {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] playWithInputString(String input) {
-        // TODO: Fill out this method to run the game using the input passed in,
-        // and return a 2D tile representation of the world that would have been
-        // drawn if the same inputs had been given to playWithKeyboard().
-
-        // TODO: Player operation
 
         int seed = parseSeed(input);
         char start = parseStart(input);
         char[] control = parseControl(input);
+        Map map = null;
 
         // N for new game
-        if (start == 'N' || start == 'n') {
-            Map map = new Map(80, 35);
+        if (start == 'n') {
+            // Crete new map and init
+            map = new Map(WIDTH, HEIGHT);
             map.setRandom(seed);
             map.initialize();
 
-            for (int i = 0; i < control.length; i++) {
-                char step = control[i];
-                if (step == 'a' || step == 'w' || step == 's' || step == 'd') {
-                    map.control(step);
-                }
+            controlMap(map, control);
+            return map.getFloorTiles();         // reminder: getFloorTiles() will compress the world map and the player, while keep the world unchanged
+        }
 
-                if (step == ':' && control[++i] == 'q') {
-                    // TODO: save
-                    break;
-                }
-            }
+        if (start == 'l') {
+            map = loadMap();
 
-            // reminder: getFloorTiles() will compress the world map and the player, while keep the world unchanged
-            return map.getFloorTiles();
+            controlMap(map, control);
+            return map.getFloorTiles();         // reminder: getFloorTiles() will compress the world map and the player, while keep the world unchanged
+        }
+
+        if (start == 'e') {
+            System.exit(0);
         }
 
         return null;
     }
 
+
+    // control the players' move through Map's api `control`
+    private static void controlMap(Map map, char[] control) {
+        for (int i = 0; i < control.length; i++) {
+            char step = control[i];
+            if (step == 'a' || step == 'w' || step == 's' || step == 'd') {
+                map.control(step);
+            }
+
+            if (step == ':' && control[++i] == 'q') {
+                saveMap(map);
+                return;
+            }
+        }
+    }
+
     private int parseSeed(String input) {
-        return Integer.parseInt(input.replaceAll("[^0-9]", ""));
+        input = input.replaceAll("[^0-9]", "");
+        return (input.isEmpty()) ? 42 : Integer.parseInt(input) ;
     }
 
     private char parseStart(String input) {
-        return input.charAt(0);
+        return input.toLowerCase().charAt(0);
     }
 
     private char[] parseControl(String input) {
-        input = input.toLowerCase();
-        int index = 1;
-        for (; index < input.length(); index++) {
-            if (!Character.isDigit(input.charAt(index))) {
-                break;
-            }
-        }
-        return input.substring(index).toCharArray();
+        input = input.toLowerCase().replaceAll("[0-9]","");
+        return input.substring(1).toCharArray();
     }
 
+    private static void saveMap(Map map) {
+        File f = new File("./map.ser");
+        try {
+            if (!f.exists()) {
+                f.createNewFile();
+            }
+            FileOutputStream fs = new FileOutputStream(f);
+            ObjectOutputStream os = new ObjectOutputStream(fs);
+            os.writeObject(map);
+            os.close();
+        } catch (IOException e) {
+            System.out.println("file not found");
+            System.exit(0);
+        }
+    }
+
+    private static Map loadMap() {
+        File f = new File("./map.ser");
+        if (f.exists()) {
+            try {
+                FileInputStream fs = new FileInputStream(f);
+                ObjectInputStream os = new ObjectInputStream(fs);
+                Map map = (Map) os.readObject();
+                os.close();
+                return map;
+            } catch (FileNotFoundException e) {
+                System.out.println("file not found");
+                System.exit(0);
+            } catch (IOException e) {
+                System.out.println(e);
+                System.exit(0);
+            } catch (ClassNotFoundException e) {
+                System.out.println("class not found");
+                System.exit(0);
+            }
+        }
+
+        Map map = new Map(WIDTH, HEIGHT);
+        map.initialize();
+        return map;
+    }
 }

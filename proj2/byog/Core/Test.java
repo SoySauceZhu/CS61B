@@ -10,12 +10,9 @@ public class Test {
 
         Map map = new Map(80, 35);
 
-        map.initialize();
-
-        TETile[][] tiles = map.getFloorTiles();
+        TETile[][] tiles = map.initialize();
 
 
         ter.renderFrame(tiles);
-
     }
 }
