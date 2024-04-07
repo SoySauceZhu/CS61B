@@ -29,7 +29,7 @@ public class Map implements Serializable {
         random = new Random();
     }
 
-    private static class Position implements Serializable{
+    private static class Position implements Serializable {
         protected int X;
         protected int Y;
 
@@ -299,35 +299,6 @@ public class Map implements Serializable {
         }
     }
 
-    /*private Room[] createRoomScheme(int roomNum) {
-        Room[] rooms = new Room[roomNum];
-
-        boolean[][] roomMap = new boolean[WIDTH][HEIGHT];
-        for (int i = 0; i < WIDTH; i++) {
-            for (int j = 0; j < HEIGHT; j++) {
-                roomMap[i][j] = true;
-            }
-        }
-
-        blockBanner(roomMap, WIDTH - 11, 0, 11, HEIGHT);
-        blockBanner(roomMap, 0, HEIGHT - 11, WIDTH, 11);
-        blockBanner(roomMap, 0, 0, WIDTH, 1);
-        blockBanner(roomMap, 0, 0, 1, HEIGHT);
-
-        for (int i = 0; i < roomNum; i++) {
-            List<Position> truePosition = booleanMapToList(roomMap);
-            Position position = truePosition.get(RandomUtils.uniform(random, 0, truePosition.size()));
-            int randX = position.X;
-            int randY = position.Y;
-            int randWidth = RandomUtils.uniform(random, 2, 10);
-            int randHeight = RandomUtils.uniform(random, 2, 10);
-
-            blockBanner(roomMap, randX, randY, randWidth, randHeight);
-            rooms[i] = new Room(randWidth, randHeight, randX, randY);
-        }
-        return rooms;
-    }*/
-
     /**
      * @return Return a list of room instances
      */
@@ -346,33 +317,6 @@ public class Map implements Serializable {
         return rooms;
     }
 
-
-    /**
-     * @return A list of Position instances that is true on the boolean map
-     */
-/*    private List<Position> booleanMapToList(boolean[][] map) {
-        List<Position> list = new ArrayList<>();
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                if (map[x][y]) {                // If (x,y) is true in boolean map
-                    list.add(new Position(x, y));
-                }
-            }
-        }
-
-        return list;
-    }*/
-
-    /**
-     * Update the boolean map by banning the given region
-     */
-    /*private void blockBanner(boolean[][] map, int X, int Y, int width, int height) {
-        for (int i = X; i < X + width; i++) {
-            for (int j = Y; j < Y + height; j++) {
-                map[i][j] = false;
-            }
-        }
-    }*/
 
     /**
      * Update the tiles by adding rooms in Room[]

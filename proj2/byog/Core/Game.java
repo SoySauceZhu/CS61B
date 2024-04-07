@@ -35,7 +35,7 @@ public class Game {
         int seed = parseSeed(input);
         char start = parseStart(input);
         char[] control = parseControl(input);
-        Map map = null;
+        Map map;
 
         // N for new game
         if (start == 'n') {
@@ -80,7 +80,7 @@ public class Game {
 
     private int parseSeed(String input) {
         input = input.replaceAll("[^0-9]", "");
-        return (input.isEmpty()) ? 42 : Integer.parseInt(input) ;
+        return (input.isEmpty()) ? 42 : Integer.parseInt(input);
     }
 
     private char parseStart(String input) {
@@ -88,7 +88,7 @@ public class Game {
     }
 
     private char[] parseControl(String input) {
-        input = input.toLowerCase().replaceAll("[0-9]","");
+        input = input.toLowerCase().replaceAll("[0-9]", "");
         return input.substring(1).toCharArray();
     }
 
