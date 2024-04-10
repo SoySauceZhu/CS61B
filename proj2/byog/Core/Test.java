@@ -5,14 +5,7 @@ import byog.TileEngine.TETile;
 
 public class Test {
     public static void main(String[] args) {
-        TERenderer ter = new TERenderer();
-        ter.initialize(80, 35);
-
-        Map map = new Map(80, 35);
-
-        TETile[][] tiles = map.initialize();
-
-
-        ter.renderFrame(tiles);
+        Game game = new Game();
+        game.playWithKeyboard();
     }
 }

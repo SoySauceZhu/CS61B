@@ -114,7 +114,7 @@ public class MemoryGame {
             playerTurn = true;
             drawFrame("");
             String input = solicitNCharsInput(round);
-            if (input.equals(str)) {
+            if (input.equalsIgnoreCase(str)) {
                 drawFrame("Nice! Well Done !");
                 StdDraw.pause(1500);
                 round++;

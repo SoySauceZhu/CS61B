@@ -2,7 +2,9 @@ package byog.Core;
 
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
+import edu.princeton.cs.introcs.StdDraw;
 
+import java.awt.*;
 import java.io.*;
 
 public class Game {
@@ -10,11 +12,57 @@ public class Game {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
+    private final Font bigFont = new Font("Monaco", Font.BOLD, 20);
+    private final Font smallFont = new Font("Monaco", Font.PLAIN, 15);
 
     /**
      * Method used for playing a fresh game. The game should start from the main menu.
      */
     public void playWithKeyboard() {
+        drawStart();
+
+        char startKey = solicitKey();
+
+        Map map = new Map(WIDTH, HEIGHT);
+
+        if (startKey == 'n' || startKey == 'N') {
+            map.initialize();
+        }
+
+        if (startKey == 'l' || startKey == 'L') {
+            map = loadMap();
+        }
+
+        ter.initialize(WIDTH, HEIGHT);
+        ter.renderFrame(map.getFloorTiles());
+
+        while (true) {
+            char key = solicitKey();
+
+            if (key == ':') {
+                char[] optionKeys = optionKeys();
+                if (optionKeys[0] == 'q' && optionKeys[1] == 10) {
+                    break;
+                }
+
+                if (optionKeys[0] == 'w' && optionKeys[1] == 10) {
+                    saveMap(map);
+                }
+
+                if (optionKeys[0] == 'w' && optionKeys[1] == 'q' && optionKeys[2] == 10) {
+                    saveMap(map);
+                    break;
+                }
+
+            } else {
+                map.control(key);
+                TETile[][] tiles = map.getFloorTiles();
+                ter.renderFrame(tiles);
+
+            }
+
+        }
+        playWithKeyboard();
     }
 
     /**
@@ -62,6 +110,30 @@ public class Game {
         return null;
     }
 
+    private char[] optionKeys() {
+        char[] combo = new char[100];
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 100; i++) {
+            char option = solicitKey();
+            sb.append(option);
+            combo[i] = option;
+            if (option == 10) {
+                break;
+            }
+            if (option == '=') {
+                combo = new char[100];
+                break;
+            }
+
+            showInput(sb.toString());
+        }
+        return combo;
+    }
+
+    private void showInput(String str) {
+        StdDraw.setFont(smallFont);
+        StdDraw.textLeft(0, 10, "Map v0.1   Game v0.1");
+    }
 
     // control the players' move through Map's api `control`
     private static void controlMap(Map map, char[] control) {
@@ -78,16 +150,16 @@ public class Game {
         }
     }
 
-    private int parseSeed(String input) {
+    private static int parseSeed(String input) {
         input = input.replaceAll("[^0-9]", "");
         return (input.isEmpty()) ? 42 : Integer.parseInt(input);
     }
 
-    private char parseStart(String input) {
+    private static char parseStart(String input) {
         return input.toLowerCase().charAt(0);
     }
 
-    private char[] parseControl(String input) {
+    private static char[] parseControl(String input) {
         input = input.toLowerCase().replaceAll("[0-9]", "");
         return input.substring(1).toCharArray();
     }
@@ -133,4 +205,36 @@ public class Game {
         map.initialize();
         return map;
     }
+
+    private static char solicitKey() {
+        while (true) {
+            if (!StdDraw.hasNextKeyTyped()) {
+                continue;
+            }
+            return (StdDraw.nextKeyTyped());
+        }
+    }
+
+    private void drawStart() {
+        int width = 60 * 8;
+        int height = 75 * 8;
+        StdDraw.setCanvasSize(width, height);
+        StdDraw.clear(Color.black);
+        StdDraw.setXscale(0, width);
+        StdDraw.setYscale(0, height);
+        StdDraw.enableDoubleBuffering();
+
+        int midWidth = width / 2;
+        int midHeight = height / 2;
+
+        StdDraw.setFont(bigFont);
+        StdDraw.setPenColor(Color.white);
+        StdDraw.text(midWidth, midHeight, "(N) New Game");
+        StdDraw.text(midWidth, midHeight - 25, "(L) Load Game");
+        StdDraw.setFont(smallFont);
+        StdDraw.textLeft(0, 10, "Map v0.1   Game v0.1");
+        StdDraw.show();
+
+    }
+
 }

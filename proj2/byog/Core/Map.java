@@ -73,8 +73,6 @@ public class Map implements Serializable {
 
         drawDoor(floorTiles);
 
-//        drawPlayer(floorTiles);
-
         return floorTiles;
     }
 
