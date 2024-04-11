@@ -27,6 +27,7 @@ public class Map implements Serializable {
         floorTiles = new TETile[WIDTH][HEIGHT];
         fillWithNothing(floorTiles);
         random = new Random();
+        playerPos = new Position(0,0);
     }
 
     private static class Position implements Serializable {
@@ -329,7 +330,7 @@ public class Map implements Serializable {
         }
     }
 
-    public void setRandom(int seed) {
+    public void setRandom(long seed) {
         this.random = new Random(seed);
     }
 
@@ -340,25 +341,25 @@ public class Map implements Serializable {
     public void control(char step) {
         int x = playerPos.X;
         int y = playerPos.Y;
-        if (step == 'w' || step == 'W') {
+        if (step == 'w' || step == 'W' || step == 'k') {
             if (!floorTiles[x][y + 1].description().equals("wall")) {
                 playerPos.Y++;
             }
         }
 
-        if (step == 'a' || step == 'A') {
+        if (step == 'a' || step == 'A' || step == 'h') {
             if (!floorTiles[x - 1][y].description().equals("wall")) {
                 playerPos.X--;
             }
         }
 
-        if (step == 's' || step == 'S') {
+        if (step == 's' || step == 'S'|| step == 'j') {
             if (!floorTiles[x][y - 1].description().equals("wall")) {
                 playerPos.Y--;
             }
         }
 
-        if (step == 'd' || step == 'D') {
+        if (step == 'd' || step == 'D'|| step == 'l') {
             if (!floorTiles[x + 1][y].description().equals("wall")) {
                 playerPos.X++;
             }

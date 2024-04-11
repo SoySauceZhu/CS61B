@@ -19,28 +19,63 @@ public class Game {
      * Method used for playing a fresh game. The game should start from the main menu.
      */
     public void playWithKeyboard() {
-        drawStart();
+        char startKey = 0;
+        long seed = 0;
 
-        char startKey = solicitKey();
+        String startStr = startMenu();
+
+        if (startStr.equalsIgnoreCase("n")
+                || startStr.equalsIgnoreCase("l")
+                || startStr.equalsIgnoreCase("e")) {
+            startKey = startStr.toLowerCase().charAt(0);
+        } else {
+            seed = parseSeed(startStr);
+        }
+
+
+        while (startKey != 'n'
+                && startKey != 'N'
+                && startKey != 'l'
+                && startKey != 'L'
+                && startKey != 'e'
+                && startKey != 'E') {
+            startKey = solicitKey();
+        }
 
         Map map = new Map(WIDTH, HEIGHT);
 
         if (startKey == 'n' || startKey == 'N') {
+            if (seed != 0) {
+                map.setRandom(seed);
+            }
             map.initialize();
+            ter.initialize(WIDTH, HEIGHT);
+            ter.renderFrame(map.getFloorTiles());
+            playInMap(map);
         }
 
         if (startKey == 'l' || startKey == 'L') {
             map = loadMap();
+            ter.initialize(WIDTH, HEIGHT);
+            ter.renderFrame(map.getFloorTiles());
+            playInMap(map);
         }
 
-        ter.initialize(WIDTH, HEIGHT);
-        ter.renderFrame(map.getFloorTiles());
+        if (startKey == 'e' || startKey == 'E') {
+            System.exit(0);
+        }
 
+
+        playWithKeyboard();
+    }
+
+    private void playInMap(Map map) {
         while (true) {
             char key = solicitKey();
 
             if (key == ':') {
                 char[] optionKeys = optionKeys();
+
                 if (optionKeys[0] == 'q' && optionKeys[1] == 10) {
                     break;
                 }
@@ -58,11 +93,8 @@ public class Game {
                 map.control(key);
                 TETile[][] tiles = map.getFloorTiles();
                 ter.renderFrame(tiles);
-
             }
-
         }
-        playWithKeyboard();
     }
 
     /**
@@ -215,26 +247,64 @@ public class Game {
         }
     }
 
-    private void drawStart() {
+    private void drawStartFrame(String cheatCode) {
         int width = 60 * 8;
         int height = 75 * 8;
-        StdDraw.setCanvasSize(width, height);
-        StdDraw.clear(Color.black);
-        StdDraw.setXscale(0, width);
-        StdDraw.setYscale(0, height);
-        StdDraw.enableDoubleBuffering();
 
         int midWidth = width / 2;
         int midHeight = height / 2;
 
+        StdDraw.clear(Color.black);
         StdDraw.setFont(bigFont);
         StdDraw.setPenColor(Color.white);
         StdDraw.text(midWidth, midHeight, "(N) New Game");
         StdDraw.text(midWidth, midHeight - 25, "(L) Load Game");
+        StdDraw.text(midWidth, midHeight - 50, "(E) Exit");
         StdDraw.setFont(smallFont);
         StdDraw.textLeft(0, 10, "Map v0.1   Game v0.1");
+        StdDraw.textRight(width, 10, cheatCode);
         StdDraw.show();
+    }
 
+    private String startMenu() {
+        int width = 60 * 8;
+        int height = 75 * 8;
+
+        StdDraw.setCanvasSize(width, height);
+        StdDraw.clear(Color.black);
+        StdDraw.setXscale(0, width);
+        StdDraw.setYscale(0, height);
+
+        StdDraw.enableDoubleBuffering();
+        String input = "";
+        drawStartFrame(input);
+
+        char firstKey = solicitKey();
+
+        if (firstKey != ':') {
+            return String.valueOf(firstKey);
+        } else {
+
+            while (true) {
+                char key = solicitKey();
+                if (key == 10) {
+                    break;
+                } else if (key == 8) {
+                    if (!input.isEmpty()) {
+                        input = input.substring(0, input.length() - 1);
+                    }
+                } else if (key == 27) {
+                    input = "";
+                    break;
+                } else {
+                    input += String.valueOf(key);
+                }
+                drawStartFrame(input);
+            }
+            drawStartFrame("");
+            System.out.println("startStr: " + input);
+            return input;
+        }
     }
 
 }
