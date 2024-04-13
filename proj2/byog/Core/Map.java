@@ -17,6 +17,8 @@ public class Map implements Serializable {
 
     private Position playerPos;
 
+    private ArrayList<Position> coinsPosition;
+
     private final TETile _default = Tileset.FLOOR;
 
     Random random;
@@ -74,21 +76,29 @@ public class Map implements Serializable {
 
         drawDoor(floorTiles);
 
+        createCoins(floorTiles);
+
         return floorTiles;
     }
 
-    private TETile[][] drawPlayer(TETile[][] floorTiles) {
-        TETile[][] output = new TETile[WIDTH][HEIGHT];
+    private void createCoins(TETile[][] floorTiles) {
+        ArrayList<Position> list = new ArrayList<>();
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
-                output[x][y] = floorTiles[x][y];
+                if (floorTiles[x][y].description().equals("floor")
+                        || !floorTiles[x][y].description().equals("grass")) ;
+                list.add(new Position(x, y));
             }
         }
 
-        int x = playerPos.X;
-        int y = playerPos.Y;
-        output[x][y] = Tileset.PLAYER;
-        return output;
+        int count = Math.min(list.size(), 15);
+
+        for (int i = 0; i < count; i++) {
+            int randomIndex = random.nextInt(list.size());
+            coinsPosition.add(list.get(randomIndex));
+            list.remove(randomIndex);
+        }
+
     }
 
     private void drawDoor(TETile[][] floorTiles) {
@@ -334,10 +344,6 @@ public class Map implements Serializable {
         this.random = new Random(seed);
     }
 
-    public TETile[][] getFloorTiles() {
-        return drawPlayer(floorTiles);
-    }
-
     public void control(char step) {
         int x = playerPos.X;
         int y = playerPos.Y;
@@ -398,4 +404,19 @@ public class Map implements Serializable {
         }
     }
 
+    public TETile[][] getFloorTiles() {
+        TETile[][] output = new TETile[WIDTH][HEIGHT];
+
+        // Copy
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                output[x][y] = floorTiles[x][y];
+            }
+        }
+
+        int x = playerPos.X;
+        int y = playerPos.Y;
+        output[x][y] = Tileset.PLAYER;
+        return output;
+    }
 }
