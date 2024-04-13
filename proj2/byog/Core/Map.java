@@ -27,7 +27,7 @@ public class Map implements Serializable {
         floorTiles = new TETile[WIDTH][HEIGHT];
         fillWithNothing(floorTiles);
         random = new Random();
-        playerPos = new Position(0,0);
+        playerPos = new Position(0, 0);
     }
 
     private static class Position implements Serializable {
@@ -342,25 +342,57 @@ public class Map implements Serializable {
         int x = playerPos.X;
         int y = playerPos.Y;
         if (step == 'w' || step == 'W' || step == 'k') {
-            if (!floorTiles[x][y + 1].description().equals("wall")) {
+            if (y < HEIGHT - 1 && !floorTiles[x][y + 1].description().equals("wall")) {
                 playerPos.Y++;
             }
         }
 
         if (step == 'a' || step == 'A' || step == 'h') {
-            if (!floorTiles[x - 1][y].description().equals("wall")) {
+            if (x > 0 && !floorTiles[x - 1][y].description().equals("wall")) {
                 playerPos.X--;
             }
         }
 
-        if (step == 's' || step == 'S'|| step == 'j') {
-            if (!floorTiles[x][y - 1].description().equals("wall")) {
+        if (step == 's' || step == 'S' || step == 'j') {
+            if (y > 0 && !floorTiles[x][y - 1].description().equals("wall")) {
                 playerPos.Y--;
             }
         }
 
-        if (step == 'd' || step == 'D'|| step == 'l') {
-            if (!floorTiles[x + 1][y].description().equals("wall")) {
+        if (step == 'd' || step == 'D' || step == 'l') {
+            if (x < WIDTH - 1 && !floorTiles[x + 1][y].description().equals("wall")) {
+                playerPos.X++;
+            }
+        }
+    }
+
+    public void ninjaControl(char step) {
+        int x = playerPos.X;
+        int y = playerPos.Y;
+        if (step == 'w' || step == 'W' || step == 'k') {
+            while (y < HEIGHT - 1 && !floorTiles[x][y + 1].description().equals("wall")) {
+                y++;
+                playerPos.Y++;
+            }
+        }
+
+        if (step == 'a' || step == 'A' || step == 'h') {
+            while (x > 0 && !floorTiles[x - 1][y].description().equals("wall")) {
+                x--;
+                playerPos.X--;
+            }
+        }
+
+        if (step == 's' || step == 'S' || step == 'j') {
+            while (y > 0 && !floorTiles[x][y - 1].description().equals("wall")) {
+                y--;
+                playerPos.Y--;
+            }
+        }
+
+        if (step == 'd' || step == 'D' || step == 'l') {
+            while (x < WIDTH - 1 && !floorTiles[x + 1][y].description().equals("wall")) {
+                x++;
                 playerPos.X++;
             }
         }

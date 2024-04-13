@@ -6,7 +6,7 @@ import byog.TileEngine.Tileset;
 
 /**
  *  Draws a world that is mostly empty except for a small region.
- */
+*/
 public class BoringWorldDemo {
     private static final int WIDTH = 60;
     private static final int HEIGHT = 30;

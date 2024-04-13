@@ -6,6 +6,7 @@ import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.*;
 import java.io.*;
+import java.util.Random;
 
 public class Game {
     TERenderer ter = new TERenderer();
@@ -21,6 +22,7 @@ public class Game {
     public void playWithKeyboard() {
         char startKey = 0;
         long seed = 0;
+        char mode = 0;
 
         String startStr = startMenu();
 
@@ -30,6 +32,8 @@ public class Game {
             startKey = startStr.toLowerCase().charAt(0);
         } else {
             seed = parseSeed(startStr);
+            System.out.println("seed: " + seed);
+            mode = parseNinja(startStr) ? 'N' : 0;   // N for ninja
         }
 
 
@@ -51,14 +55,14 @@ public class Game {
             map.initialize();
             ter.initialize(WIDTH, HEIGHT);
             ter.renderFrame(map.getFloorTiles());
-            playInMap(map);
+            playInMap(map, mode);
         }
 
         if (startKey == 'l' || startKey == 'L') {
             map = loadMap();
             ter.initialize(WIDTH, HEIGHT);
             ter.renderFrame(map.getFloorTiles());
-            playInMap(map);
+            playInMap(map, mode);
         }
 
         if (startKey == 'e' || startKey == 'E') {
@@ -69,7 +73,13 @@ public class Game {
         playWithKeyboard();
     }
 
-    private void playInMap(Map map) {
+    private boolean parseNinja(String input) {
+        String subString = "ninja";
+
+        return input.toLowerCase().contains(subString);
+    }
+
+    private void playInMap(Map map, char mode) {
         while (true) {
             char key = solicitKey();
 
@@ -90,7 +100,11 @@ public class Game {
                 }
 
             } else {
-                map.control(key);
+                if (mode == 'N') {
+                    map.ninjaControl(key);
+                } else {
+                    map.control(key);
+                }
                 TETile[][] tiles = map.getFloorTiles();
                 ter.renderFrame(tiles);
             }
@@ -183,8 +197,10 @@ public class Game {
     }
 
     private static int parseSeed(String input) {
-        input = input.replaceAll("[^0-9]", "");
-        return (input.isEmpty()) ? 42 : Integer.parseInt(input);
+        String str;
+        str = input.replaceAll("[^0-9]", "");
+        Random rand = new Random();
+        return (str.isEmpty()) ? rand.nextInt() : Integer.parseInt(str);
     }
 
     private static char parseStart(String input) {
