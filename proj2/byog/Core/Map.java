@@ -17,7 +17,7 @@ public class Map implements Serializable {
 
     private Position playerPos;
 
-    private ArrayList<Position> coinsPosition;
+    private final ArrayList<Position> coinsPosition = new ArrayList<>();
 
     private final TETile _default = Tileset.FLOOR;
 
@@ -41,6 +41,11 @@ public class Map implements Serializable {
             Y = y;
         }
 
+        @Override
+        public boolean equals(Object obj) {
+            Position pos = (Position) obj;
+            return pos.X == this.X && pos.Y == this.Y;
+        }
     }
 
     private static class Room {
@@ -86,8 +91,9 @@ public class Map implements Serializable {
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
                 if (floorTiles[x][y].description().equals("floor")
-                        || !floorTiles[x][y].description().equals("grass")) ;
-                list.add(new Position(x, y));
+                        || floorTiles[x][y].description().equals("grass")) {
+                    list.add(new Position(x, y));
+                }
             }
         }
 
@@ -370,6 +376,12 @@ public class Map implements Serializable {
                 playerPos.X++;
             }
         }
+
+        for (int i = 0; i < coinsPosition.size(); i++) {
+            if (coinsPosition.get(i).equals(playerPos)) {
+                coinsPosition.remove(i);
+            }
+        }
     }
 
     public void ninjaControl(char step) {
@@ -413,6 +425,13 @@ public class Map implements Serializable {
                 output[x][y] = floorTiles[x][y];
             }
         }
+
+        for (Position pos : coinsPosition) {
+            int x = pos.X;
+            int y = pos.Y;
+            output[x][y] = Tileset.COIN;
+        }
+
 
         int x = playerPos.X;
         int y = playerPos.Y;
