@@ -56,10 +56,19 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     }
 
     /** Returns a BSTMap rooted in p with (KEY, VALUE) added as a key-value mapping.
-      * Or if p is null, it returns a one node BSTMap containing (KEY, VALUE).
+     * Or if p is null, it returns a one node BSTMap containing (KEY, VALUE).
      */
     private Node putHelper(K key, V value, Node p) {
-        throw new UnsupportedOperationException();
+        if (p == null) {
+            p = new Node(key, value);
+            size++;
+        }
+
+        if (key.compareTo(p.key) > 0) p.right = putHelper(key, value, p.right);
+        if (key.compareTo(p.key) < 0) p.left = putHelper(key, value, p.left);
+        if (key.compareTo(p.key) == 0) p.value = value;
+
+        return p;       // return p itself to it's parent.left/right
     }
 
     /** Inserts the key KEY
@@ -67,7 +76,8 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
      */
     @Override
     public void put(K key, V value) {
-        throw new UnsupportedOperationException();
+        root = putHelper(key, value, root);
+
     }
 
     /* Returns the number of key-value mappings in this map. */
@@ -76,7 +86,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         throw new UnsupportedOperationException();
     }
 
-    //////////////// EVERYTHING BELOW THIS LINE IS OPTIONAL ////////////////
+//////////////// EVERYTHING BELOW THIS LINE IS OPTIONAL ////////////////
 
     /* Returns a Set view of the keys contained in this map. */
     @Override
@@ -105,5 +115,10 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     @Override
     public Iterator<K> iterator() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }
